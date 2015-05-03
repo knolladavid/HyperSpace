@@ -6,8 +6,12 @@ namespace HyperSpace
 {
     internal class Program
     {
+        //play the game function 
         private static void Main(string[] args)
         {
+            HyperSpace game = new HyperSpace();
+            game.PlayGame();
+         
         }
     }
 
@@ -65,19 +69,22 @@ namespace HyperSpace
 
         public Random rng = new Random();
 
-        public HyperSpace(int Score, int Speed, List<Unit> ObstacleList)
+       /// <summary>
+       /// 
+       /// </summary>
+        public HyperSpace()
         {
-            
             this.Score = 0;
             this.Speed = 0;
             this.ObstacleList = new List<Unit>();
             this.SpaceShip = new Unit((Console.WindowWidth / 2) - 1, Console.WindowHeight - 1, ConsoleColor.Red, "@", false);
-            
-            Console.BufferHeight = Console.WindowHeight;
+            this.Smashed = false;
+            //Console.BufferHeight = 30;
             Console.WindowHeight = 30;
-            Console.BufferWidth = Console.BufferWidth;
-            Console.BufferWidth = 60;
+            //Console.BufferWidth = 30;
+            Console.WindowWidth = 50;
         }
+
         public void PlayGame()
         {
             while (Smashed == false)
@@ -85,12 +92,12 @@ namespace HyperSpace
                 int spaceRiftProb = rng.Next(1, 11);
                 if (spaceRiftProb == 10)
                 {
-                       Unit spaceRift = new Unit(rng.Next(0,Console.WindowWidth - 2), 5, ConsoleColor.Green, "%", true);
+                    Unit spaceRift = new Unit(rng.Next(Console.WindowWidth - 2), 5, ConsoleColor.Green, "%", true);
                     ObstacleList.Add(spaceRift);
                 }
                 else
                 {
-                    Unit Obstacle = new Unit(rng.Next(0,Console.WindowWidth - 2), 5);
+                    Unit Obstacle = new Unit(rng.Next( Console.WindowWidth - 2), 5);
                     ObstacleList.Add(Obstacle);
                 }
                 MoveShip();
@@ -102,22 +109,21 @@ namespace HyperSpace
                     Speed++;
                 }
                 System.Threading.Thread.Sleep(170 - Speed);
+                
             }
         }
-       
-        
-        
+
         public void MoveShip()
         {
             if (Console.KeyAvailable)
             {
                 ConsoleKeyInfo keyPressed = Console.ReadKey();
-                
+
                 while (Console.KeyAvailable)
                 {
                     Console.ReadKey(true);
                 }
-                //if the key pressed is left arrow and space ship X position is less than 0 decrease ships position by 1 
+                //if the key pressed is left arrow and space ship X position is less than 0 decrease ships position by 1
                 if (keyPressed.Key == ConsoleKey.LeftArrow && SpaceShip.X > 0)
                 {
                     SpaceShip.X--;
@@ -129,20 +135,19 @@ namespace HyperSpace
                 }
             }
         }
-       
-        
+
         public void MoveObstacles()
         {
             List<Unit> newObstacleList = new List<Unit>();
             foreach (Unit stuff in ObstacleList)
-              {
+            {
                 stuff.Y++;
 
                 if ((stuff.IsSpaceRift) && stuff.X == SpaceShip.X && stuff.Y == SpaceShip.Y)
                 {
                     Speed -= 50;
                 }
-                else if (! stuff.IsSpaceRift && stuff.X == SpaceShip.X && stuff.Y == SpaceShip.Y)
+                else if (!stuff.IsSpaceRift && stuff.X == SpaceShip.X && stuff.Y == SpaceShip.Y)
                 {
                     Smashed = true;
                 }
@@ -158,13 +163,25 @@ namespace HyperSpace
             ObstacleList = newObstacleList;
         }
 
-        }
-       
-        
         public void DrawGame()
         {
-
-
-
+            Console.Clear();
+            SpaceShip.Draw();
+            foreach (Unit stuff in ObstacleList)
+            {
+                stuff.Draw();
+            }
+            PrintAtPosition(20, 2, "Score:" + this.Score, ConsoleColor.Green);
+            PrintAtPosition(20, 3, "Speed:" + this.Speed, ConsoleColor.Green);
         }
+
+        public void PrintAtPosition(int x, int y, string text, ConsoleColor color)
+        {
+            Console.SetCursorPosition(x, y);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(text);
+        }
+
+        
     }
+}
